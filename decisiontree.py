@@ -3,11 +3,14 @@ import pandas as pd
 import math as math
 import node as nd
 import operator
+import matplotlib.pyplot as plt
+import Performance as perf
+import time
 
 
 def main():
     print("decision tree")
-    pass
+    test2()
 
 
 def test():
@@ -46,6 +49,7 @@ def test2():
     training = pd.read_csv('data/iris.test.data', header=None)
     print(data)
     listofclusters = data[4].unique()
+    # check neta 19, 8, 6, 5, 4
     node = createdecisionTree(data, 5, 0.9, [0, 1, 2, 3], 4, listofclusters)
     print(node)
     l = node.predictlabel(training.iloc[0].to_numpy())
@@ -53,11 +57,64 @@ def test2():
     node.predict_data_set(training)
     print(training)
 
+    # acc = perf.accuracy(training, 4, 5)
+    # print(acc)
+    prec_i = perf.precision(training, 4, 5, listofclusters)
+    print(prec_i)
+    rec_i = perf.recall(training, 4, 5, listofclusters)
+    print(rec_i)
+    F_i = perf.F_measure(training, 4, 5, listofclusters)
+    print(F_i)
+
+
+def satellite_data_test3():
+    data = pd.read_csv('data/satellite/sat.trn', header=None)
+    training = pd.read_csv('data/satellite/sat.tst', header=None)
+    y = data[36]
+    y.hist()
+    plt.show()
+
+    # print(data)
+    listofclusters = data[36].unique()
+    listofattributes = np.arange(0, 36)
+    #check neta 300, 200, 100
+    node = createdecisionTree(data, 200, 0.8, listofattributes, 36, listofclusters)
+    print(node)
+    # l = node.predictlabel(training.iloc[0].to_numpy())
+    # print(l)
+    node.predict_data_set(training)
+    # print(training)
+    training.to_csv('data/satellite/sat.ts.result', index=False)
+
+
+def shuttle_data_test4():
+    data = pd.read_csv('data/shuttle/shuttle.trn', header=None)
+    training = pd.read_csv('data/shuttle/shuttle.tst', header=None)
+    y = data[9]
+    y.hist()
+    plt.show()
+
+    # print(data)
+    listofclusters = data[9].unique()
+    listofattributes = np.arange(0, 9)
+    # check neta 600, 500, 400
+    node = createdecisionTree(data, 500, 0.85, listofattributes, 9, listofclusters)
+    print(node)
+    # l = node.predictlabel(training.iloc[0].to_numpy())
+    # print(l)
+    node.predict_data_set(training)
+    # print(training)
+    training.to_csv('data/shuttle/shuttle.tst.rslt', index=False)
+
 
 def createdecisionTree(data, neta, phi, listofattributes, labelattribute, listofclusters):
     # create tree and initialize it to empty
     initialnode = nd.Node()
+
+    start_time = time.time()
+
     result = decisiontree(initialnode, data, neta, phi, listofattributes, labelattribute, listofclusters)
+    print("--- %s seconds ---" % (time.time() - start_time))
     return result
 
 
@@ -160,7 +217,7 @@ def eval_numeric_attr(data, attribute, labelattribute, listofclusters):
             ny = sigma_N_vj
             nn = sigma_nj_Nvj
 
-    print("Best v: ", v_best, " best score: ", best_score)
+    print("Best v: ", v_best, " best score: ", best_score, " attribute: ", attribute)
     return v_best, best_score, ny, nn
 
 
@@ -186,10 +243,13 @@ def gain(n, freq_of_classes_dict, p_ci_Dy, p_ci_Dn, ny, nn):
     HD_Y_N = (ny / n) * HD_Y + (nn / n) * HD_N
 
     result = HD - HD_Y_N
-    print("gain: ", result)
+    # print("gain: ", result)
     return result
 
 
 if __name__ == '__main__':
     # test()
-    test2()
+    # test2()
+    # satellite_data_test3()
+    main()
+    # shuttle_data_test4()
